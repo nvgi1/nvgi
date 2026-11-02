@@ -10,33 +10,91 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as NotepinRouteImport } from './routes/notepin'
+import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as WorldRouteImport } from './routes/world'
+import { Route as WpContentSplatRouteImport } from './routes/wp-content/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotepinRoute = NotepinRouteImport.update({
+  id: '/notepin',
+  path: '/notepin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorldRoute = WorldRouteImport.update({
+  id: '/world',
+  path: '/world',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WpContentSplatRoute = WpContentSplatRouteImport.update({
+  id: '/wp-content/$',
+  path: '/wp-content/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/notepin': typeof NotepinRoute
+  '/projects': typeof ProjectsRoute
+  '/world': typeof WorldRoute
+  '/wp-content/$': typeof WpContentSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/notepin': typeof NotepinRoute
+  '/projects': typeof ProjectsRoute
+  '/world': typeof WorldRoute
+  '/wp-content/$': typeof WpContentSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/notepin': typeof NotepinRoute
+  '/projects': typeof ProjectsRoute
+  '/world': typeof WorldRoute
+  '/wp-content/$': typeof WpContentSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/contact' | '/notepin' | '/projects' | '/world' | '/wp-content/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/contact' | '/notepin' | '/projects' | '/world' | '/wp-content/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/contact'
+    | '/notepin'
+    | '/projects'
+    | '/world'
+    | '/wp-content/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactRoute: typeof ContactRoute
+  NotepinRoute: typeof NotepinRoute
+  ProjectsRoute: typeof ProjectsRoute
+  WorldRoute: typeof WorldRoute
+  WpContentSplatRoute: typeof WpContentSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +106,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notepin': {
+      id: '/notepin'
+      path: '/notepin'
+      fullPath: '/notepin'
+      preLoaderRoute: typeof NotepinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/world': {
+      id: '/world'
+      path: '/world'
+      fullPath: '/world'
+      preLoaderRoute: typeof WorldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wp-content/$': {
+      id: '/wp-content/$'
+      path: '/wp-content/$'
+      fullPath: '/wp-content/$'
+      preLoaderRoute: typeof WpContentSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactRoute: ContactRoute,
+  NotepinRoute: NotepinRoute,
+  ProjectsRoute: ProjectsRoute,
+  WorldRoute: WorldRoute,
+  WpContentSplatRoute: WpContentSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
