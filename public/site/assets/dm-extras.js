@@ -7,9 +7,13 @@
     { title: "I Wanna Be Yours", artist: "Arctic Monkeys", art: "/site/assets/art-iwby.jpg", src: "/site/assets/track-i-wanna-be-yours.mp3" },
     { title: "Blinding Lights", artist: "The Weeknd", art: "/site/assets/art-bl.jpg", src: "/site/assets/track-blinding-lights.mp3" }
   ];
+  var AR = document.documentElement.lang === "ar";
   var current = 0, muted = false, bypass = false;
+  var userVol = 1;
+  try { userVol = Math.max(0, Math.min(1, parseFloat(localStorage.getItem("dmVol")) || 1)); } catch (e) {}
+  window.__dmUserVol = userVol;
   var alt = new Audio();
-  alt.loop = true; alt.preload = "none"; alt.volume = 0.6;
+  alt.loop = true; alt.preload = "none"; alt.volume = 0.6 * userVol;
 
   // Every extra song copies the built-in song's live sound: the same underwater
   // muffling and the same fades (View our work, Projects, Contact, World).
@@ -50,18 +54,20 @@
   }
   setInterval(function () {
     var b = muteBtn();
-    var inter = /^\/(notepin|world)(\/|$)/.test(location.pathname);
+    var inter = /^\/world(\/|$)/.test(location.pathname);
     if (b && (!b.style.getPropertyValue("--dm-art") || inter !== panel.classList.contains("is-inter"))) render();
+    // Guard: an extra song is on, so the site's own song must stay silent (no two songs at once).
+    if (!alt.paused && current !== 0 && !muted && !siteMuted() && Date.now() - (window.__dmMuteFixAt || 0) > 1500) { window.__dmMuteFixAt = Date.now(); setSiteMute(true); }
     if (!fx || alt.paused) return;
     var t = fx.ctx.currentTime, gd = guide(), inWorld = /^\/world/.test(location.pathname);
     if (!gd) {
-      // The site stops its own song inside Digitmask World: keep ours, but softer and dreamier.
+      // The site stops its own song inside the World page: keep ours, but softer and dreamier.
       if (inWorld) gd = { freq: 2600, vol: 0.75, rate: 1 };
       else { keepGuidePlaying(); return; }
     }
     fx.f.frequency.setTargetAtTime(Math.max(40, Math.min(gd.freq, worldCap())), t, 0.08);
-    // Interstellar owns NotePin and World: the chosen song steps aside there.
-    fx.g.gain.setTargetAtTime(window.__dmInterOn ? 0 : Math.max(0, Math.min(1, gd.vol)), t, 0.08);
+    // Interstellar owns World: the chosen song steps aside there.
+    fx.g.gain.setTargetAtTime(window.__dmInterOn ? 0 : Math.max(0, Math.min(1, gd.vol)) * userVol, t, 0.08);
     var r = Math.max(0.5, Math.min(1, gd.rate || 1));
     if (Math.abs(alt.playbackRate - r) > 0.01) { alt.preservesPitch = false; alt.playbackRate = r; }
   }, 60);
@@ -78,9 +84,9 @@
   var panel = document.createElement("div");
   panel.className = "dm-music";
   panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-label", "Choose music");
+  panel.setAttribute("aria-label", AR ? "اختر الموسيقى" : "Choose music");
   panel.innerHTML =
-    '<p class="dm-music__label">Now playing</p><ul class="dm-music__list">' +
+    '<p class="dm-music__label">' + (AR ? "يعمل الآن" : "Now playing") + '</p><ul class="dm-music__list">' +
     TRACKS.map(function (t, i) {
       return '<li><button type="button" class="dm-music__track" data-i="' + i + '">' +
         '<img src="' + t.art + '" alt="" width="40" height="40">' +
@@ -90,17 +96,20 @@
     '<li class="dm-music__inter"><button type="button" class="dm-music__track dm-music__track--inter is-active">' +
     '<img src="/site/assets/art-interstellar.jpg" alt="" width="40" height="40"><span><b>Interstellar</b><small>Hans Zimmer</small></span>' +
     '<i class="dm-music__eq" aria-hidden="true"><em></em><em></em><em></em></i></button></li>' +
-    '</ul><button type="button" class="dm-music__mute"><span class="dm-music__mute-icon" aria-hidden="true"></span><span class="dm-music__mute-text">Mute</span></button>';
+    '</ul><div class="dm-music__vol"><span aria-hidden="true">🔈</span>' +
+    '<input type="range" class="dm-music__vol-range" min="0" max="100" value="' + Math.round(userVol * 100) + '" aria-label="' + (AR ? "مستوى الصوت" : "Volume") + '">' +
+    '<span aria-hidden="true">🔊</span></div>' +
+    '<button type="button" class="dm-music__mute"><span class="dm-music__mute-icon" aria-hidden="true"></span><span class="dm-music__mute-text">' + (AR ? "كتم الصوت" : "Mute") + '</span></button>';
   document.body.appendChild(panel);
 
   function render() {
     panel.querySelectorAll(".dm-music__track").forEach(function (el) {
       if (el.dataset.i != null) el.classList.toggle("is-active", +el.dataset.i === current);
     });
-    var inter = /^\/(notepin|world)(\/|$)/.test(location.pathname);
+    var inter = /^\/world(\/|$)/.test(location.pathname);
     panel.classList.toggle("is-inter", inter);
     panel.classList.toggle("is-muted", muted);
-    panel.querySelector(".dm-music__mute-text").textContent = muted ? "Unmute" : "Mute";
+    panel.querySelector(".dm-music__mute-text").textContent = muted ? (AR ? "تشغيل الصوت" : "Unmute") : (AR ? "كتم الصوت" : "Mute");
     var b = muteBtn();
     if (b) b.style.setProperty("--dm-art", "url('" + (inter ? "/site/assets/art-interstellar.jpg" : TRACKS[current].art) + "')");
   }
@@ -134,6 +143,21 @@
     }
     if (!e.target.closest || !e.target.closest(".dm-music")) open(false);
   }, true);
+
+  // Volume slider: controls the extra songs, the site's own song and Interstellar together.
+  panel.querySelector(".dm-music__vol-range").addEventListener("input", function (e) {
+    userVol = Math.max(0, Math.min(1, (+e.target.value || 0) / 100));
+    window.__dmUserVol = userVol;
+    alt.volume = 0.6 * userVol;
+    var H = window.__dmHowler;
+    if (H) {
+      H._volume = userVol;
+      if (H.masterGain && H.ctx && !H._muted && !window.__dmInterOn) {
+        try { H.masterGain.gain.setTargetAtTime(userVol, H.ctx.currentTime, 0.1); } catch (err) {}
+      }
+    }
+    try { localStorage.setItem("dmVol", String(userVol)); } catch (err) {}
+  });
 
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) alt.pause();
@@ -180,14 +204,18 @@
     var services = [].slice.call(f.querySelectorAll('input[name="service"]:checked')).map(function (x) { return x.value; });
     var v = function (n) { return f.querySelector("[name=" + n + "]").value.trim(); }; var name = v("name"), phone = v("phone"), email = v("email");
     var msg = "";
-    if (!services.length) msg = "Please choose at least one service.";
-    else if (!name) msg = "Please enter your name.";
-    else if (!/^\+?[0-9\s-]{7,20}$/.test(phone)) msg = "Please enter a valid phone number.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) msg = "Please enter a valid email.";
+    if (!services.length) msg = AR ? "اختر خدمة واحدة على الأقل." : "Please choose at least one service.";
+    else if (!name) msg = AR ? "اكتب اسمك من فضلك." : "Please enter your name.";
+    else if (!/^\+?[0-9\s-]{7,20}$/.test(phone)) msg = AR ? "اكتب رقم هاتف صحيح." : "Please enter a valid phone number.";
+    else if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) msg = AR ? "اكتب بريدًا إلكترونيًا صحيحًا." : "Please enter a valid email.";
     err.textContent = msg;
     if (msg) return;
+    var lines = [AR ? "طلب مشروع جديد" : "New project request",
+      (AR ? "الخدمة: " : "Service: ") + services.join(", "),
+      (AR ? "الاسم: " : "Name: ") + name, (AR ? "الهاتف: " : "Phone: ") + phone, (AR ? "البريد: " : "Email: ") + email];
+    var det = v("details"); if (det) lines.push((AR ? "التفاصيل: " : "Details: ") + det);
+    window.open("https://wa.me/201222576172?text=" + encodeURIComponent(lines.join("\n")), "_blank", "noopener");
     f.querySelector(".dm-brief__done").hidden = false;
-    f.querySelector(".dm-brief__submit").disabled = true;
   });
 
   render();
@@ -195,7 +223,7 @@
 
 /* Copyright notice and light copy protection */
 (function () {
-  try { console.log("%c© 2026 Digitmask — All rights reserved. Unauthorized copying is prohibited.", "font-weight:bold"); } catch (e) {}
+  try { console.log("%c© 2026 Abdelrahman Studio — All rights reserved. Unauthorized copying is prohibited.", "font-weight:bold"); } catch (e) {}
   document.addEventListener("contextmenu", function (e) {
     if (e.target && e.target.closest && e.target.closest("input, textarea")) return;
     e.preventDefault();
@@ -204,61 +232,62 @@
     if (e.target && e.target.tagName === "IMG") e.preventDefault();
   });
 })();
-/* NotePin: the Projects water scene showing only the NotePin tiles. From Home the
-   same dive plays upwards (theme flips the camera for /notepin/). */
+/* Projects: the filter buttons choose which service cards the water scene shows. */
 (function () {
-  var btn, last = "";
-  function isNp(p) { return /^\/notepin\/?$/.test(p); }
   function isPr(p) { return /^\/projects\/?$/.test(p); }
-  function names(np) {
-    return (window.projects || []).filter(function (e) {
-      var c = e.project.project_grid_category || [];
-      return np ? c.indexOf("experiment") > -1 && /^dm-np-/.test(e.images[0].name) : !/^dm-np-/.test(e.images[0].name);
-    }).map(function (e) { return e.project.title; });
+  function names() {
+    return (window.projects || []).map(function (e) { return e.project.title; });
   }
-  function apply(np) {
+  function apply() {
     var G = window.__dmG, PM = G && G.ProjectMenu;
     if (!PM || !PM.projects || !PM.projects.children.length || !window.__dmEmit) return false;
     // Wait for any running card animation, otherwise the two clash and cards stay missing.
-    if (PM.animatingFilter) return false;
+    if (PM.animatingFilter || (G.Highway && G.Highway.running)) return false;
     // Keep the filter buttons in step with the cards: "All" is the active one.
-    if (!np) document.querySelectorAll(".js-project-filters\\:filterBtn").forEach(function (b) {
+    document.querySelectorAll(".js-project-filters\\:filterBtn").forEach(function (b) {
       b.classList.toggle("is-active", b.dataset.filter === "all");
     });
-    window.__dmEmit("ProjectFilters:change", names(np)); return true;
+    if (needs(names())) emit(names()); return true;
   }
-  function make() {
-    btn = document.createElement("a");
-    btn.href = "/notepin/"; btn.className = "dm-rise"; btn.setAttribute("aria-label", "Rise up to PLAUD NotePin");
-    btn.innerHTML = '<span class="dm-rise__arrow">↑</span><span>PLAUD NotePin</span>';
-    document.body.appendChild(btn);
-    var go = function (e) {
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      if (go.busy) return; go.busy = true; window.__dmGoingNp = Date.now(); setTimeout(function () { go.busy = false; }, 1500);
-      var H = window.__dmG && window.__dmG.Highway;
-      try { if (H && H.redirect) H.redirect(location.origin + "/notepin/"); else location.href = "/notepin/"; }
-      catch (er) { location.href = "/notepin/"; }
-      // If the scene ignores the request, open the page anyway.
-      setTimeout(function () { if (!isNp(location.pathname)) location.href = "/notepin/"; }, 2500);
-    };
-    btn.addEventListener("click", go, true);
-    btn.addEventListener("pointerdown", function (e) { e.stopPropagation(); }, true);
+  var lastList = null, busySince = 0;
+  function emit(list) { lastList = list; window.__dmEmit("ProjectFilters:change", list); }
+  // If a page change interrupts the card animation, the scene stays "busy" forever and the
+  // cards freeze. Finish it ourselves so the cards and filters always keep working.
+  function unstick(now) {
+    var PM = window.__dmG && window.__dmG.ProjectMenu; if (!PM || !PM.projects) return;
+    if (!PM.animatingFilter) { busySince = 0; return; }
+    if (!busySince) { busySince = now; return; }
+    if (now - busySince < 2600) return;
+    busySince = 0;
+    var list = lastList || names();
+    try {
+      PM.projects.children.forEach(function (c) {
+        var on = list.indexOf(c.name) > -1; c.visible = on;
+        if (on) { c.position.z = 1000; [0, 1].forEach(function (k) { var m = c.children[k] && c.children[k].material; if (m && m.uniforms && m.uniforms.u_opacity) m.uniforms.u_opacity.value = 1; }); }
+      });
+      PM.positionProjects && PM.positionProjects();
+    } catch (e) {}
+    PM.animatingFilter = false; PM.allowControl = true;
+  }
+  // True only when the scene is not already showing exactly these cards.
+  function needs(list) {
+    var PM = window.__dmG && window.__dmG.ProjectMenu; if (!PM || !PM.projects) return false;
+    var vis = 0, lit = 0, wrong = false;
+    PM.projects.children.forEach(function (c) {
+      var want = list.indexOf(c.name) > -1;
+      if (!!c.visible !== want) wrong = true;
+      if (c.visible) { vis++; try { if (c.children[0].material.uniforms.u_opacity.value > 0.05) lit++; } catch (e) { lit++; } }
+    });
+    return wrong || (vis > 0 && lit === 0);
   }
   document.addEventListener("click", function (e) {
-    if (!e.isTrusted) return; var a = e.target.closest && e.target.closest("a[href], .dm-rise, .dm-nav-np"); if (!a || a.closest(".dm-music, .dm-sheet")) return;
-    if (a.closest(".dm-npx") && !/^\/(contact|projects|world)?\/?$/.test(new URL(a.href || location.href, location.href).pathname) && !a.classList.contains("dm-nav-np")) return;
+    if (!e.isTrusted) return; var a = e.target.closest && e.target.closest("a[href]"); if (!a || a.closest(".dm-music, .dm-sheet")) return;
     var H = window.__dmG && window.__dmG.Highway, now = Date.now();
     if ((H && H.running) || now - (window.__dmNavAt || 0) < 2200) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); return; }
     if (a.href && new URL(a.href, location.href).origin === location.origin) window.__dmNavAt = now;
   }, true);
-  // Projects <-> NotePin share one scene: switch with a normal page load.
-  document.addEventListener("click", function (e) {
-    var a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
-    var to = new URL(a.href, location.href).pathname, from = location.pathname;
-    if ((isNp(from) && isPr(to)) || (isPr(from) && isNp(to))) { e.preventDefault(); e.stopPropagation(); location.href = to; }
-  }, true);
-  var pending = null, shownAt = 0;
-  // Filter buttons: we choose the cards ourselves (never the hidden NotePin ones) and retry
+  var pending = null;
+  // Filter buttons: we choose the cards ourselves and retry
   // until the scene is free, so pressing any filter — or All — always shows its cards.
   function showFilter(f, tries) {
     var G = window.__dmG, PM = G && G.ProjectMenu;
@@ -267,10 +296,10 @@
     }
     var list = (window.projects || []).filter(function (e) {
       var c = e.project.project_grid_category || [];
-      return !/^dm-np-/.test(e.images[0].name) && (f === "all" || c.indexOf(f) > -1);
+      return f === "all" || c.indexOf(f) > -1;
     }).map(function (e) { return e.project.title; });
-    if (!list.length) list = names(false);
-    window.__dmEmit("ProjectFilters:change", list);
+    if (!list.length) list = names();
+    if (needs(list)) emit(list);
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest(".js-project-filters\\:filterBtn"); if (!b || !b.dataset.filter) return;
@@ -282,57 +311,68 @@
   var prWas = false;
   setInterval(function () {
     var on = isPr(location.pathname);
-    if (on && !prWas) [400, 1500, 3500].forEach(function (t) { setTimeout(function () {
+    if (on && !prWas) [1800, 4500].forEach(function (t) { setTimeout(function () {
       if (!isPr(location.pathname)) return;
       var act = document.querySelector(".js-project-filters\\:filterBtn.is-active");
       if (!act || act.dataset.filter === "all") showFilter("all");
     }, t); });
     prWas = on;
   }, 250);
-  // Every frame: Services tiles only show on Projects, or on Home when not coming from / going to NotePin.
+  // Every frame: service tiles only show on Projects.
   (function tiles() {
+    unstick(performance.now());
     var p = location.pathname, PMg = window.__dmG && window.__dmG.ProjectMenu && window.__dmG.ProjectMenu.projects;
-    var want = isPr(p) || (!isNp(p) && !window.__dmFromNp && !(window.__dmGoingNp && Date.now() - window.__dmGoingNp < 7000));
+    var want = isPr(p);
     if (PMg && "visible" in PMg && PMg.visible !== want) {
       PMg.visible = want;
       // Coming back into view: reload the cards exactly like pressing "All", so none stay missing.
-      if (want) setTimeout(function () { if (!apply(isNp(location.pathname))) pending = isNp(location.pathname); }, 60);
+      if (want) pending = true;
     }
     requestAnimationFrame(tiles);
   })();
+  var last = "";
   setInterval(function () {
-    if (!document.body) return; if (!btn) make();
+    if (!document.body) return;
     var p = location.pathname;
-    if (p !== last) { last = p; pending = isNp(p) ? true : isPr(p) ? false : null; }
-    if (pending !== null && apply(false)) pending = null;
-    // NotePin floats over empty water: the Projects tiles are hidden there.
-    var PMg = window.__dmG && window.__dmG.ProjectMenu && window.__dmG.ProjectMenu.projects;
-    if (isNp(p)) window.__dmGoingNp = 0;
-    var L = document.querySelector(".loader.js-loader"), cs = L && getComputedStyle(L);
-    var M = document.querySelector(".js-menu"), mOpen = M && M.classList.contains("is-open");
-    var show = !mOpen && p === "/" && (!L || cs.visibility === "hidden" || cs.display === "none" || +cs.opacity < .1);
-    if (show && !shownAt) shownAt = Date.now(); if (!show) shownAt = 0;
-    btn.classList.toggle("is-visible", show && Date.now() - shownAt > 1500);
+    if (p !== last) { last = p; pending = isPr(p) ? false : null; }
+    if (pending !== null && apply()) pending = null;
   }, 250);
 })();
 
-/* Interstellar: plays from 2:10 (file is pre-trimmed) and loops, ONLY on NotePin and World.
+/* Interstellar: plays from 2:10 (file is pre-trimmed) and loops, ONLY on World.
    Everywhere else it is fully stopped. While it plays, the other music steps aside so two
-   songs never overlap. Respects the music panel's mute. */
+   songs never overlap. Respects the music panel's mute.
+   iPhones ignore an audio element's volume, so the level runs through a Web Audio gain:
+   fades and silences then work the same on every phone. */
 (function () {
   var a = new Audio();
   a.loop = true; a.preload = "none"; a.volume = 0;
   var SRC = "/site/assets/track-interstellar.mp3?v=1";
-  var unlocked = false, vol = 0, ducked = false, duckAt = 0;
-  function here() { return /^\/(notepin|world)(\/|$)/.test(location.pathname); }
+  var unlocked = false, vol = 0, ducked = false, duckAt = 0, gain = null, gctx = null;
+  function here() { return /^\/world(\/|$)/.test(location.pathname); }
   function target() {
     if (document.hidden || window.__dmMusicMuted || !here()) return 0;
-    return 0.55;
+    return 0.55 * (window.__dmUserVol == null ? 1 : window.__dmUserVol);
+  }
+  function wire() {
+    if (gain) return;
+    try {
+      var H = window.__dmHowler;
+      gctx = (H && H.ctx) || new (window.AudioContext || window.webkitAudioContext)();
+      var src = gctx.createMediaElementSource(a);
+      gain = gctx.createGain(); gain.gain.value = vol;
+      src.connect(gain); gain.connect(gctx.destination);
+      a.volume = 1;
+    } catch (e) { gain = null; }
   }
   function start() {
     if (!a.src) a.src = SRC;
+    wire();
+    if (gctx && gctx.state === "suspended") gctx.resume().catch(function () {});
     a.play().catch(function () {});
   }
+  function stop() { vol = 0; if (gain) gain.gain.value = 0; else a.volume = 0; if (!a.paused) a.pause(); }
+  window.__dmInterStop = stop;
   function unlock() { unlocked = true; if (target() > 0 && a.paused) start(); }
   ["click", "touchend", "keydown"].forEach(function (ev) { document.addEventListener(ev, unlock, true); });
   function duck(on) {
@@ -345,120 +385,44 @@
       g.setTargetAtTime(on || H._muted ? 0 : (H._volume == null ? 1 : H._volume), t, 0.25);
     } catch (e) {}
   }
+  var lastAt = performance.now();
   setInterval(function () {
-    var t = target();
+    var t = target(), now = performance.now();
+    // Busy phones can delay this timer; scale the fade by the real time passed.
+    var k = 1 - Math.pow(0.9, Math.min(10, (now - lastAt) / 50)); lastAt = now;
     window.__dmInterOn = t > 0;
+    // Leaving World: cut straight away instead of fading over the next song.
+    if (t === 0 && !here()) { if (vol > 0 || !a.paused) stop(); duck(false); return; }
     duck(t > 0);
     if (t > 0 && unlocked && a.paused) start();
-    vol += (t - vol) * 0.1; if (Math.abs(t - vol) < 0.004) vol = t;
-    a.volume = Math.max(0, Math.min(1, vol));
+    vol += (t - vol) * k; if (Math.abs(t - vol) < 0.004) vol = t;
+    if (gain) gain.gain.value = Math.max(0, Math.min(1, vol)); else a.volume = Math.max(0, Math.min(1, vol));
     if (t === 0 && vol === 0 && !a.paused) a.pause();
   }, 50);
+  window.addEventListener("pagehide", stop);
 })();
 
-/* NotePin page: its own dusk-coloured layer over the water scene. The product floats on a
-   see-through background with features spread down the page (no project tiles). It opens
-   on its own timer, so it never waits on the 3D scene. */
+/* Never two songs at once: if an extra song is playing, the site's own song must stay muted,
+   and nothing keeps playing when the page is left or put in the background. */
 (function () {
-  var el, shownAt = 0, entered = 0, leftAt = 0, doneAt = 0;
-  document.addEventListener("click", function (e) {
-    if (e.target.closest && e.target.closest(".js-enter-btn, .js-enter-no-audio-btn, .loader button")) entered = Date.now();
-  }, true);
-  var F = [
-    ["Records every word", "One tap. Crystal-clear audio from across the table."],
-    ["Writes it for you", "Accurate transcripts in 112 languages, Arabic included."],
-    ["Summaries by morning", "Key points, deadlines and action items, ready to file."],
-    ["Private by design", "Encrypted end to end. Your client files stay yours."]
-  ];
-  var V = [["/site/assets/np-product.png", "Front"], ["/site/assets/np-product.png", "Angle"], ["/site/assets/np-product.png", "Detail"]];
-  function show(i) {
-    el.querySelectorAll(".dm-npx__shot").forEach(function (x, k) { x.classList.toggle("is-on", k === i); });
-    el.querySelectorAll(".dm-npx__view").forEach(function (x, k) { x.classList.toggle("is-on", k === i); });
-  }
-  document.addEventListener("click", function (e) {
-    var b = e.target.closest && e.target.closest(".dm-npx__view"); if (b) show(+b.dataset.v);
+  window.addEventListener("pagehide", function () {
+    document.querySelectorAll("audio").forEach(function (x) { try { x.pause(); } catch (e) {} });
+    var H = window.__dmHowler; if (H && H.ctx && H.ctx.suspend) try { H.ctx.suspend(); } catch (e) {}
   });
-  function build() {
-    el = document.createElement("section"); el.className = "dm-npx"; el.setAttribute("aria-label", "PLAUD NotePin");
-    el.innerHTML =
-      '<div class="dm-npx__glow"></div>' +
-      '<header class="dm-npx__hero"><div class="dm-npx__copy dm-glass"><p class="dm-npx__kicker">Digitmask × PLAUD</p>' +
-      '<h2 class="dm-npx__title">PLAUD<br><em>NotePin</em></h2>' +
-      '<p class="dm-npx__lead">The AI note-taker trusted by leading lawyers and law firms.</p>' +
-      '<ul class="dm-npx__stats"><li><b>112</b><span>languages</span></li><li><b>20h</b><span>recording</span></li><li><b>30g</b><span>weight</span></li></ul>' +
-      '<a class="dm-npx__btn" href="mailto:hello@digitmask.com?subject=NotePin%20subscription">Subscribe · AED 800 / month</a></div>' +
-      '<div class="dm-npx__product"><div class="dm-npx__stage">' + V.map(function (v, i) {
-        return '<img class="dm-npx__shot dm-npx__shot--' + i + (i ? '' : ' is-on') + '" src="' + v[0] + '" alt="PLAUD NotePin, ' + v[1] + '" width="1024" height="1024">';
-      }).join("") + '</div><div class="dm-npx__views dm-glass" role="tablist" aria-label="Product views">' + V.map(function (v, i) {
-        return '<button type="button" class="dm-npx__view' + (i ? '' : ' is-on') + '" data-v="' + i + '" aria-label="' + v[1] + '"><img src="' + v[0] + '" alt="" width="56" height="56"><span>' + v[1] + '</span></button>';
-      }).join("") + '</div></div></header>' +
-      '<div class="dm-npx__feats">' + F.map(function (f, i) {
-        return '<div class="dm-npx__feat dm-glass dm-npx__feat--' + i + '"><span>0' + (i + 1) + '</span><h3>' + f[0] + '</h3><p>' + f[1] + '</p></div>';
-      }).join("") + '</div>' +
-      '<section class="dm-npx__how"><p class="dm-npx__kicker">How it works</p><h2 class="dm-npx__h2">Three steps. Zero typing.</h2><ol>' +
-        '<li class="dm-glass"><b>1</b><h3>Press</h3><p>Squeeze once. A soft buzz tells you it is listening.</p></li>' +
-        '<li class="dm-glass"><b>2</b><h3>Talk</h3><p>Hold the meeting as usual. NotePin catches every voice in the room.</p></li>' +
-        '<li class="dm-glass"><b>3</b><h3>Read</h3><p>Open the app for a clean transcript, summary and action list.</p></li></ol></section>' +
-      '<section class="dm-npx__specs dm-glass"><h2 class="dm-npx__h2">Made for the way lawyers work</h2><dl>' +
-        '<div><dt>Wear it your way</dt><dd>Clip, magnetic pin, wristband or necklace</dd></div>' +
-        '<div><dt>Languages</dt><dd>112, including Arabic and English</dd></div>' +
-        '<div><dt>Battery</dt><dd>A full working day of recording</dd></div>' +
-        '<div><dt>Weight</dt><dd>Lighter than a key</dd></div>' +
-        '<div><dt>Privacy</dt><dd>Encrypted, your files stay yours</dd></div>' +
-        '<div><dt>Support</dt><dd>Set up and support by Digitmask in the UAE</dd></div></dl></section>' +
-      '<section class="dm-npx__faq"><h2 class="dm-npx__h2">Questions</h2>' +
-        '<details class="dm-glass"><summary>Is the device included?</summary><p>Yes. The monthly plan includes the NotePin, the AI service and support.</p></details>' +
-        '<details class="dm-glass"><summary>Does it understand Arabic?</summary><p>Yes, and it can mix Arabic and English in the same meeting.</p></details>' +
-        '<details class="dm-glass"><summary>Can I cancel?</summary><p>Anytime. Just tell us and we collect the device.</p></details></section>' +
-'<footer class="dm-npx__price dm-glass"><p class="dm-npx__kicker">One simple plan</p><p class="dm-npx__amount">AED 800<small> / month</small></p>' +
-      '<p class="dm-npx__lead">Device, AI transcription and support included. Cancel anytime.</p>' +
-      '<a class="dm-npx__btn" href="/contact/">Talk to us</a></footer>';
-    ["wheel", "touchmove", "touchstart", "pointerdown", "mousedown"].forEach(function (ev) {
-      el.addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true });
-    });
-    document.body.appendChild(el);
-  }
-  // Top-menu NotePin link: same rise as the Home button.
-  document.addEventListener("click", function (e) {
-    var a = e.target.closest && e.target.closest(".dm-nav-np"); if (!a) return;
-    e.preventDefault(); e.stopPropagation();
-    if (/^\/notepin/.test(location.pathname)) return;
-    var r = document.querySelector(".dm-rise");
-    if (location.pathname === "/" && r) { r.click(); return; }
-    location.href = "/notepin/";
-  }, true);
-  setInterval(function () {
-    if (!document.body) return; if (!el) build();
-    var on = /^\/notepin/.test(location.pathname);
-    document.documentElement.classList.toggle("dm-on-np", on);
-    if (on) { window.__dmFromNp = true; leftAt = 0; }
-    else if (window.__dmFromNp) { if (!leftAt) leftAt = Date.now(); else if (Date.now() - leftAt > 4000) window.__dmFromNp = false; }
-    if (!on) {
-      shownAt = 0;
-      // Projects is a different place: never let the NotePin layer linger there.
-      el.classList.toggle("is-instant", /^\/projects/.test(location.pathname));
-      el.classList.remove("is-visible");
-      if (!window.__dmFromNp) el.scrollTop = 0;
-      return;
-    }
-    el.classList.remove("is-instant");
-    if (!shownAt) shownAt = Date.now();
-    var L = document.querySelector(".loader.js-loader"), cs = L && getComputedStyle(L);
-    if (L && entered && +cs.opacity < .6) L.style.visibility = "hidden";
-    var ready = !L || cs.visibility === "hidden" || cs.display === "none" || +cs.opacity < .1;
-    // Show after the rise finishes, or 4s after Enter whatever the scene is doing.
-    // Appear only once the rise above the water has finished (fallback if the scene stalls).
-    var H = window.__dmG && window.__dmG.Highway, moving = H && H.running;
-    if (moving || !ready) doneAt = 0; else if (!doneAt) doneAt = Date.now();
-    if (doneAt || Date.now() - shownAt > 7000) { el.classList.add("is-visible"); if (L && ready) L.style.visibility = "hidden"; }
-  }, 200);
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    var H = window.__dmHowler; if (H && H.ctx && H.ctx.resume) try { H.ctx.resume(); } catch (err) {}
+  });
+  document.addEventListener("visibilitychange", function () {
+    var H = window.__dmHowler; if (!H || !H.ctx) return;
+    try { if (document.hidden) H.ctx.suspend(); else if (!window.__dmMusicMuted) H.ctx.resume(); } catch (e) {}
+  });
 })();
-
 
 /* Smoothness: picture sharpness follows the device. The scene starts at a level chosen from
    the phone/computer's strength, then steps down if frames drop and back up if there is room. */
 (function () {
-  var frames = 0, since = 0, steps = 0, last = location.pathname, quietUntil = 0;
+  var frames = 0, since = 0, steps = 0, good = 0, last = location.pathname, quietUntil = 0;
   function gl() { var G = window.__dmG; return G && G.Gl && G.Gl.renderer ? G.Gl : null; }
   function setPR(pr) {
     var G = gl(), o = window.__dmG; if (!G) return;
@@ -480,12 +444,15 @@
     if (document.hidden || now < quietUntil || !ready() || !gl()) { frames = 0; since = 0; return; }
     if (!since) { since = now; frames = 0; return; }
     frames++;
-    if (now - since < 3000) return;
+    if (now - since < 1600) return;
     var fps = frames * 1000 / (now - since); frames = 0; since = now;
     var G = gl(), pr = G.renderer.getPixelRatio(), cap = window.__dmPR || 1.5;
-    var floor = matchMedia("(pointer:coarse)").matches ? 0.75 : 1;
-    if (fps < 45 && pr > floor + 0.01) { setPR(Math.max(floor, pr - 0.25)); steps++; }
-    else if (fps > 58 && pr < cap - 0.01 && steps < 6) { setPR(Math.min(cap, pr + 0.25)); steps++; }
+    var floor = matchMedia("(pointer:coarse)").matches ? 0.85 : 1.05;
+    var phone = floor < 1;
+    // Phones step down faster and only step up after two smooth checks in a row, so they never stutter.
+    if (fps < 50 && pr > floor + 0.01) { setPR(Math.max(floor, pr - (phone && fps < 40 ? 0.35 : 0.25))); steps++; good = 0; }
+    else if (fps > 58 && pr < cap - 0.01 && steps < 8) { if (!phone || ++good >= 2) { setPR(Math.min(cap, pr + 0.25)); steps++; good = 0; } }
+    else good = 0;
   }
   requestAnimationFrame(tick);
 })();
@@ -518,7 +485,7 @@
   function open(url) {
     if (Date.now() - busy < 1300) return; busy = Date.now();
     url = new URL(url, location.href).pathname;
-    if (!oldTitle) oldTitle = document.title; document.title = nameOf(url) + " — Digitmask Example";
+    if (!oldTitle) oldTitle = document.title; document.title = nameOf(url) + " — Abdelrahman Studio Example";
     if (box) { // next example: slide the current one away, the next one in
       var old = box.querySelector("iframe"), f = document.createElement("iframe");
       f.src = url; f.title = "Example"; f.className = "dm-ex__f is-next"; box.appendChild(f);
@@ -551,4 +518,168 @@
     if (e.data.dm === "close-example") close();
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+})();
+
+/* Loader watchdog: Enter must appear within ~2.5s even if the 3D scene is slow */
+(function () {
+  function forceEnter() {
+    var btn = document.querySelector('.js-enter-btn');
+    if (!btn) return;
+    if (getComputedStyle(btn).visibility === 'visible') return;
+    btn.style.setProperty('opacity', '1', 'important');
+    btn.style.setProperty('visibility', 'visible', 'important');
+    var na = document.querySelector('.js-enter-no-audio-btn');
+    if (na) {
+      na.style.setProperty('opacity', '1', 'important');
+      na.style.setProperty('visibility', 'visible', 'important');
+    }
+    var prog = document.querySelector('.js-loader-progress');
+    if (prog) prog.style.transform = 'translateY(0%)';
+    var inner = document.querySelector('.js-loader-progress-inner');
+    if (inner) inner.style.transform = 'translateY(0%)';
+  }
+  /* After Enter: release the forced styles and make sure the loader never blocks the site */
+  document.addEventListener('click', function (e) {
+    if (!(e.target.closest && e.target.closest('.js-enter-btn, .js-enter-no-audio-btn'))) return;
+    /* The entry flight is the heaviest moment of the whole site: drop the render
+       sharpness to the floor before it starts so the page never freezes, then let
+       the smoothness stepper raise it again once frames are steady. */
+    try {
+      var G = window.__dmG;
+      if (G && G.Gl && G.Gl.renderer) {
+        var floor = matchMedia('(pointer:coarse)').matches ? 0.85 : 1.05;
+        G.Gl.renderer.setPixelRatio(floor);
+        if (G.Gl.composer) {
+          G.Gl.composer.setPixelRatio(floor);
+          G.Gl.composer.setSize(G.window.w, G.window.fullHeight);
+        }
+        if (G.Gl.fxaaPass) G.Gl.fxaaPass.material.uniforms.resolution.value.set(1 / (G.window.w * floor), 1 / (G.window.fullHeight * floor));
+        if (G.Gl.globalUniforms && G.Gl.globalUniforms.u_resolution) G.Gl.globalUniforms.u_resolution.value.set(G.window.w * floor, G.window.fullHeight * floor);
+      }
+    } catch (err) {}
+    setTimeout(function () {
+      document.querySelectorAll('.js-enter-btn, .js-enter-no-audio-btn').forEach(function (b) {
+        b.style.removeProperty('opacity'); b.style.removeProperty('visibility');
+        b.style.opacity = '0'; b.style.visibility = 'hidden';
+      });
+    }, 600);
+    setTimeout(function () {
+      var L = document.querySelector('.js-loader');
+      if (L) L.classList.add('dm-gone');
+    }, 2200);
+  }, true);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(forceEnter, 2000); });
+  } else {
+    setTimeout(forceEnter, 2000);
+  }
+})();
+
+/* Colour wash only after the loader is gone */
+(function () {
+  function markIn() { document.documentElement.classList.add('dm-in'); }
+  var loader = document.querySelector('.js-loader');
+  if (!loader) { markIn(); return; }
+  function check() {
+    var cs = getComputedStyle(loader);
+    if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.05) markIn();
+  }
+  new MutationObserver(check).observe(loader, { attributes: true, attributeFilter: ['style', 'class'] });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('.js-enter-btn, .js-enter-no-audio-btn')) markIn();
+  });
+  setInterval(check, 1000);
+})();
+
+/* Steady screen on phones: no pinch-zoom, no double-tap zoom, no sideways drifting. */
+(function () {
+  var stop = function (e) { e.preventDefault(); };
+  ["gesturestart", "gesturechange", "gestureend"].forEach(function (ev) { document.addEventListener(ev, stop, { passive: false }); });
+  document.addEventListener("touchmove", function (e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  var lastEnd = 0;
+  document.addEventListener("touchend", function (e) {
+    var now = Date.now();
+    if (now - lastEnd < 300 && !(e.target.closest && e.target.closest("input, textarea, select, a, button"))) e.preventDefault();
+    lastEnd = now;
+  }, { passive: false });
+  // If anything ever nudges the page sideways, put it back.
+  window.addEventListener("scroll", function () { if (window.scrollX) window.scrollTo(0, window.scrollY); }, { passive: true });
+})();
+
+/* Tilt parallax: on phones with a motion sensor, tilting the phone gently sways the 3D scene.
+   Turns on with Enter (iPhones ask permission at that tap), very smooth, and pauses while a
+   finger is on the screen. Phones without the sensor simply keep the normal view. */
+(function () {
+  if (!matchMedia("(pointer:coarse)").matches || !("DeviceOrientationEvent" in window)) return;
+  var on = false, base = null, tx = 0, ty = 0, sx = 0, sy = 0, touchAt = 0, running = false;
+  function allowed() { return !/^\/projects\/?$/.test(location.pathname) && !document.documentElement.classList.contains("dm-siding"); }
+  function onOri(e) {
+    if (e.gamma == null || e.beta == null) return;
+    if (!base) base = { b: e.beta, g: e.gamma };
+    var g = Math.max(-25, Math.min(25, e.gamma - base.g)), b = Math.max(-20, Math.min(20, e.beta - base.b));
+    tx = g / 25 * 0.55; ty = -b / 20 * 0.4;
+    // Slowly re-centre around however the phone is being held.
+    base.g += (e.gamma - base.g) * 0.004; base.b += (e.beta - base.b) * 0.004;
+    if (!running) { running = true; requestAnimationFrame(loop); }
+  }
+  function loop() {
+    var G = window.__dmG, m = G && G.mouse && G.mouse.glNormalized;
+    if (!m || document.hidden) { running = false; return; }
+    sx += (tx - sx) * 0.06; sy += (ty - sy) * 0.06;
+    if (allowed() && Date.now() - touchAt > 700) m.set(sx, sy);
+    requestAnimationFrame(loop);
+  }
+  ["touchstart", "touchmove", "touchend"].forEach(function (ev) { document.addEventListener(ev, function () { touchAt = Date.now(); }, { passive: true, capture: true }); });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) base = null; });
+  function enable() {
+    if (on) return; on = true;
+    window.addEventListener("deviceorientation", onOri, { passive: true });
+  }
+  document.addEventListener("click", function (e) {
+    if (!(e.target.closest && e.target.closest(".js-enter-btn, .js-enter-no-audio-btn"))) return;
+    var D = window.DeviceOrientationEvent;
+    if (D && typeof D.requestPermission === "function") {
+      D.requestPermission().then(function (r) { if (r === "granted") enable(); }).catch(function () {});
+    } else enable();
+  }, true);
+  // Arriving from Story behind the veil (Enter pressed for the visitor): Android needs no permission.
+  setTimeout(function () {
+    var D = window.DeviceOrientationEvent;
+    if (document.documentElement.classList.contains("dm-in") && !(D && typeof D.requestPermission === "function")) enable();
+  }, 4000);
+})();
+
+/* Black-screen guard: if the phone drops the 3D picture (low memory after many page changes),
+   reload the current page instead of leaving a black or mixed-up screen. */
+(function () {
+  var hooked = null;
+  setInterval(function () {
+    var G = window.__dmG, c = G && G.Gl && G.Gl.renderer && G.Gl.renderer.domElement;
+    if (!c || c === hooked) return;
+    hooked = c;
+    var timer = 0;
+    c.addEventListener("webglcontextlost", function (e) {
+      e.preventDefault();
+      clearTimeout(timer);
+      timer = setTimeout(function () { if (!document.hidden) location.reload(); }, 1500);
+    });
+    c.addEventListener("webglcontextrestored", function () { clearTimeout(timer); });
+  }, 1000);
+})();
+
+/* Stronger copy protection: blocks the usual shortcuts for viewing, saving and inspecting the code,
+   and text/image copying outside the form fields. */
+(function () {
+  document.addEventListener("keydown", function (e) {
+    var k = (e.key || "").toLowerCase(), c = e.ctrlKey || e.metaKey;
+    if (k === "f12" || (c && (k === "u" || k === "s" || k === "p")) || (c && e.shiftKey && (k === "i" || k === "j" || k === "c")) || (e.metaKey && e.altKey && (k === "i" || k === "j" || k === "c" || k === "u"))) {
+      e.preventDefault(); e.stopPropagation();
+    }
+  }, true);
+  ["copy", "cut"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { if (!(e.target.closest && e.target.closest("input, textarea"))) e.preventDefault(); }, true);
+  });
+  var st = document.createElement("style");
+  st.textContent = "body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea{-webkit-user-select:text;user-select:text}img{-webkit-user-drag:none}";
+  document.head.appendChild(st);
 })();
