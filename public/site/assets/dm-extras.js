@@ -223,7 +223,7 @@
 
 /* Copyright notice and light copy protection */
 (function () {
-  try { console.log("%c© 2026 Abdelrahman Studio — All rights reserved. Unauthorized copying is prohibited.", "font-weight:bold"); } catch (e) {}
+  try { console.log("%c© 2026 NAGI — All rights reserved. Unauthorized copying is prohibited.", "font-weight:bold"); } catch (e) {}
   document.addEventListener("contextmenu", function (e) {
     if (e.target && e.target.closest && e.target.closest("input, textarea")) return;
     e.preventDefault();
@@ -485,7 +485,7 @@
   function open(url) {
     if (Date.now() - busy < 1300) return; busy = Date.now();
     url = new URL(url, location.href).pathname;
-    if (!oldTitle) oldTitle = document.title; document.title = nameOf(url) + " — Abdelrahman Studio Example";
+    if (!oldTitle) oldTitle = document.title; document.title = nameOf(url) + " — NAGI Example";
     if (box) { // next example: slide the current one away, the next one in
       var old = box.querySelector("iframe"), f = document.createElement("iframe");
       f.src = url; f.title = "Example"; f.className = "dm-ex__f is-next"; box.appendChild(f);
