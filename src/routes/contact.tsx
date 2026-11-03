@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { sitePage } from "@/lib/site-page";
+import { siteHead, sitePage } from "@/lib/site-page";
 
 export const Route = createFileRoute("/contact")({
+  head: () => siteHead("contact"),
   server: { handlers: { GET: async () => sitePage("contact") } },
 });
