@@ -1,0 +1,49 @@
+.loader {
+  --entry-ink: #241c14;
+  --entry-copy: #5a4a36;
+  --entry-button: #ffffff;
+  font-family: "Noto Sans Arabic", "Neue Montreal", sans-serif;
+}
+.loader .dm-load b {
+  font-family: "Neue Montreal", Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.loader .dm-load b span { animation: none; }
+.loader .loader__title {
+  font: 400 1.65rem/1.6 "Noto Sans Arabic", sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-bottom: .55rem;
+}
+.loader .loader__tagline {
+  font: 400 1.35rem/1.75 "Noto Sans Arabic", sans-serif;
+  letter-spacing: 0;
+  max-width: min(42rem, 92vw);
+  margin-bottom: 1.5rem;
+}
+.loader .js-enter-btn {
+  background: var(--entry-button);
+  color: var(--entry-ink);
+  border-radius: 999px;
+  min-width: 13rem;
+  height: 4.25rem;
+  bottom: -4.75rem;
+}
+.loader .js-enter-btn .btn__text {
+  font: 400 1.6rem/1.5 "Noto Sans Arabic", sans-serif;
+  letter-spacing: 0;
+}
+.loader .js-enter-btn .btn__icon { margin-left: .65rem; }
+.loader .loader__btn {
+  font: 400 1.05rem/1.7 "Noto Sans Arabic", sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+@media (max-width: 600px) {
+  .loader .loader__title { font-size: 1.35rem; }
+  .loader .loader__tagline { font-size: 1.1rem; padding: 0 .5rem; }
+  .loader .js-enter-btn { min-width: 12rem; height: 3.8rem; bottom: -4.2rem; }
+  .loader .js-enter-btn .btn__text { font-size: 1.4rem; }
+  .loader .loader__btn { font-size: .95rem; }
+}

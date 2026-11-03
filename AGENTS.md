@@ -21,3 +21,4 @@
 - Examples (public/examples/*.html) are standalone pages opened inside the site in a sliding iframe layer from dm-extras.js, so their heavy 3D code never loads on Home and they stay separate from the water scene.
 - The reference site's Story page is served as its own original HTML document at /story, with dm-veil.js handling transitions to and from the water-scene pages, so its independent narrative experience stays intact.
 - Newly imported reference media uses committed Lovable Assets pointers resolved in exported HTML and supplemental scripts; existing scene files retain their local paths to preserve the original loader and texture pipeline.
+- Home's entry presentation is scoped in public/site/assets/nagi-entry.css so its lettering can change without altering the shared scene loader or other pages.
