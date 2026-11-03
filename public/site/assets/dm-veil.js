@@ -13,7 +13,7 @@
     ov = D.createElement('div');
     ov.id = 'dmv';
     ov.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H100V100H0Z"/></svg>' +
-      '<div class="dmv-mark"><img src="/__l5e/assets-v1/4df3b493-dda2-4fb4-b200-8da7d095d8c9/abdelrahman-logo.webp" alt=""><span>NAGI</span><i></i></div>';
+      '<div class="dmv-mark"><img src="/__l5e/assets-v1/f1f2bf6d-3986-401f-a0e6-7f44a4f0a8f5/nagi-logo.png" alt=""><span>NAGI</span><i></i></div>';
     D.body.insertBefore(ov, D.body.firstChild);
   }
   var path = ov.querySelector('path'), mark = ov.querySelector('.dmv-mark');
