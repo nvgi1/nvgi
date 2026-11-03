@@ -34,6 +34,7 @@ export function siteHead(name: keyof typeof pages) {
 export function sitePage(name: keyof typeof pages) {
   // Avoid a redirect for every bundled image, font, script and 3D asset.
   const html = pages[name]
+    .replace('href="/favicon.png"', 'href="/site/assets/favicon-32x32-1d5ggzi.png"')
     .replace(/\/wp-content\/[^\s"'<>?#)]+(?:\?[^\s"'<>)]*)?/g, (source) => {
       const path = source.split("?")[0];
       const filename = path?.split("/").pop() ?? "";
