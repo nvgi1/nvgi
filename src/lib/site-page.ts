@@ -41,7 +41,6 @@ export function sitePage(name: keyof typeof pages) {
     pages[name],
   );
   const html = sourceHtml
-    .replace('href="/favicon.png"', 'href="/site/assets/favicon-32x32-1d5ggzi.png"')
     .replace(/\/wp-content\/[^\s"'<>?#)]+(?:\?[^\s"'<>)]*)?/g, (source) => {
       const path = source.split("?")[0];
       const filename = path?.split("/").pop() ?? "";
