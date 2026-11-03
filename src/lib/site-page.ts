@@ -5,6 +5,7 @@ import world from "./site-pages/world.html?raw";
 import notepin from "./site-pages/notepin.html?raw";
 import story from "./site-pages/story.html?raw";
 import assetMap from "./site-asset-map.json";
+import worldAssets from "./reference-world-assets.json";
 
 const pages = { home, contact, projects, world, notepin, story } as const;
 
@@ -33,7 +34,13 @@ export function siteHead(name: keyof typeof pages) {
 // site's scripts choose the 3D scene from the current address.
 export function sitePage(name: keyof typeof pages) {
   // Avoid a redirect for every bundled image, font, script and 3D asset.
-  const html = pages[name]
+  const sourceHtml = Object.entries(worldAssets).reduce(
+    (document, [filename, url]) => document
+      .replaceAll(`/site/assets/${filename}`, url)
+      .replaceAll(`\\/site\\/assets\\/${filename}`, url),
+    pages[name],
+  );
+  const html = sourceHtml
     .replace('href="/favicon.png"', 'href="/site/assets/favicon-32x32-1d5ggzi.png"')
     .replace(/\/wp-content\/[^\s"'<>?#)]+(?:\?[^\s"'<>)]*)?/g, (source) => {
       const path = source.split("?")[0];
