@@ -1,4 +1,4 @@
-/* Abdelrahman Studio — liquid page transition shared by every page.
+/* NAGI — liquid page transition shared by every page.
    Leaving: an ivory surface rises from the bottom with a soft liquid edge and the
    wordmark settles in the centre. The next page starts on the exact same frame and
    lifts the surface away once it is ready, so the jump between pages is invisible. */
@@ -13,7 +13,7 @@
     ov = D.createElement('div');
     ov.id = 'dmv';
     ov.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H100V100H0Z"/></svg>' +
-      '<div class="dmv-mark"><img src="/__l5e/assets-v1/4df3b493-dda2-4fb4-b200-8da7d095d8c9/abdelrahman-logo.webp" alt=""><span>Abdelrahman Studio</span><i></i></div>';
+      '<div class="dmv-mark"><img src="/__l5e/assets-v1/4df3b493-dda2-4fb4-b200-8da7d095d8c9/abdelrahman-logo.webp" alt=""><span>NAGI</span><i></i></div>';
     D.body.insertBefore(ov, D.body.firstChild);
   }
   var path = ov.querySelector('path'), mark = ov.querySelector('.dmv-mark');

@@ -10,11 +10,11 @@ import worldAssets from "./reference-world-assets.json";
 const pages = { home, contact, projects, world, notepin, story } as const;
 
 const pageDetails = {
-  home: ["Abdelrahman Studio — Websites, Systems & 3D Experiences", "A brand and digital studio in Riyadh, Dubai and Cairo. Crafting brands that command attention."],
-  projects: ["Projects — Abdelrahman Studio", "Explore Abdelrahman Studio's websites, systems, brand work and immersive experiences."],
-  contact: ["Contact — Abdelrahman Studio", "Start your next website, system or brand project with Abdelrahman Studio."],
-  world: ["World — Inside Abdelrahman Studio", "Step inside Abdelrahman Studio's immersive world of brand and digital craft."],
-  story: ["The Story — Abdelrahman Studio", "Discover the story behind Abdelrahman Studio, from the first idea to Riyadh, Dubai and Cairo."],
+  home: ["NAGI — Websites, Systems & 3D Experiences", "A brand and digital studio in Riyadh, Dubai and Cairo. Crafting brands that command attention."],
+  projects: ["Projects — NAGI", "Explore NAGI's websites, systems, brand work and immersive experiences."],
+  contact: ["Contact — NAGI", "Start your next website, system or brand project with NAGI."],
+  world: ["World — Inside NAGI", "Step inside NAGI's immersive world of brand and digital craft."],
+  story: ["The Story — NAGI", "Discover the story behind NAGI, from the first idea to Riyadh, Dubai and Cairo."],
   notepin: ["NotePin — Studio Product Experience", "Explore the NotePin product in an immersive studio experience."],
 } as const;
 
