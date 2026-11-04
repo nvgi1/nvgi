@@ -24,3 +24,9 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+To download the referenced Lovable assets into `public/site/assets` and localize their references, run:
+
+```sh
+node scripts/download-lovable-assets.mjs
+```

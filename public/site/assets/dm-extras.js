@@ -6,8 +6,8 @@
     { title: "Spill Your Time", artist: "KatzPascale", art: "/site/assets/art-syt.jpg", src: null },
     { title: "I Wanna Be Yours", artist: "Arctic Monkeys", art: "/site/assets/art-iwby.jpg", src: "/site/assets/track-i-wanna-be-yours.mp3" },
     { title: "Blinding Lights", artist: "The Weeknd", art: "/site/assets/art-bl.jpg", src: "/site/assets/track-blinding-lights.mp3" },
-    { title: "تملي معاك (مقطع ٢)", artist: "عمرو دياب", art: "/__l5e/assets-v1/b6922bf2-2545-40bc-9b93-2fe81751ed8a/tamally-maak-2-cover-sm.webp", src: "/__l5e/assets-v1/abe9ba94-30e8-42d8-aa13-61e72f952b7f/tamally-maak-2.mp3" },
-    { title: "تملي معاك", artist: "عمرو دياب", art: "/__l5e/assets-v1/cbcb8a4a-3c20-4fdc-9fc7-548eb0cabaee/tamally-maak-cover-sm.webp", src: "/__l5e/assets-v1/5b86ac64-b21c-4600-8fa3-cdfafa5322c3/tamally-maak.mp3" }
+    { title: "تملي معاك (مقطع ٢)", artist: "عمرو دياب", art: "/site/assets/tamally-maak-2-cover-sm.webp", src: "/site/assets/tamally-maak-2.mp3" },
+    { title: "تملي معاك", artist: "عمرو دياب", art: "/site/assets/tamally-maak-cover-sm.webp", src: "/site/assets/tamally-maak.mp3" }
   ];
   var AR = document.documentElement.lang === "ar";
   var current = 0, muted = false, bypass = false;

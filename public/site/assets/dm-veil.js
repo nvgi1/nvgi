@@ -13,7 +13,7 @@
     ov = D.createElement('div');
     ov.id = 'dmv';
     ov.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H100V100H0Z"/></svg>' +
-      '<div class="dmv-mark"><img src="/__l5e/assets-v1/d2692566-1a10-4b09-8b5e-62a83fe655a6/nagi-logo-sm.webp" alt=""><span>NAGI</span><i></i></div>';
+      '<div class="dmv-mark"><img src="/site/assets/nagi-logo-sm.webp" alt=""><span>NAGI</span><i></i></div>';
     D.body.insertBefore(ov, D.body.firstChild);
   }
   var path = ov.querySelector('path'), mark = ov.querySelector('.dmv-mark');
@@ -112,7 +112,7 @@
     fetched[url] = 1;
     var l = D.createElement('link'); l.rel = 'prefetch'; l.href = url; D.head.appendChild(l);
     if (url.indexOf('/story') === 0) {
-      var i = new Image(); i.src = '/__l5e/assets-v1/443f1d33-8df4-4291-9229-7be886b3003a/story-flowers.jpg';
+      var i = new Image(); i.src = '/site/assets/story-flowers.jpg';
     }
   }
 
