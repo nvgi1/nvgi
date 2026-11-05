@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f1e7" />
+    <title>نبذة عني — ناجي</title>
+    <meta
+      name="description"
+      content="أنا ناجي، أصمم وأبني هويات ومواقع وأنظمة رقمية وتجارب تفاعلية."
+    />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f6f1e7;
+        --ink: #241c14;
+        --muted: #68594b;
+        --accent: #a77b48;
+        --line: rgba(36, 28, 20, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-width: 320px;
+        background: var(--paper);
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "DM Sans", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .about-header {
+        display: flex;
+        min-height: 88px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px clamp(24px, 4.5vw, 64px);
+        direction: ltr;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 22px;
+        letter-spacing: -0.06em;
+        text-decoration: none;
+      }
+
+      .brand img {
+        width: 26px;
+        height: 34px;
+        object-fit: contain;
+      }
+
+      .about-nav {
+        display: flex;
+        align-items: center;
+        gap: clamp(18px, 3vw, 36px);
+      }
+
+      .about-nav a {
+        font-size: 14px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .about-nav a:hover,
+      .about-nav a[aria-current="page"] {
+        color: var(--accent);
+      }
+
+      .about-main {
+        display: flex;
+        min-height: calc(100svh - 88px);
+        flex-direction: column;
+        align-items: center;
+        padding: clamp(24px, 5vh, 52px) 24px 42px;
+        text-align: center;
+      }
+
+      .portrait {
+        display: block;
+        width: clamp(112px, 14vw, 150px);
+        height: auto;
+        margin-bottom: 24px;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 12px rgba(48, 34, 24, 0.08));
+      }
+
+      .eyebrow {
+        margin: 0 0 2px;
+        color: var(--accent);
+        font:
+          400 17px/1.5 "Amiri",
+          serif;
+      }
+
+      h1 {
+        margin: 0;
+        font:
+          700 clamp(42px, 6vw, 68px)/1.2 "Amiri",
+          serif;
+      }
+
+      .intro {
+        width: min(100%, 690px);
+        margin: 16px 0 0;
+        color: var(--muted);
+        font:
+          400 clamp(18px, 2.05vw, 22px)/1.9 "Amiri",
+          serif;
+        text-wrap: pretty;
+      }
+
+      .divider {
+        width: 96px;
+        height: 1px;
+        margin: 36px 0 30px;
+        border: 0;
+        background: var(--accent);
+        opacity: 0.8;
+      }
+
+      .skills {
+        display: flex;
+        max-width: 720px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .skill {
+        padding: 7px 19px 9px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: #382f27;
+        font:
+          400 17px/1.5 "Amiri",
+          serif;
+        white-space: nowrap;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 42px;
+      }
+
+      .action {
+        display: inline-flex;
+        min-height: 58px;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 29px;
+        border: 1px solid var(--ink);
+        border-radius: 999px;
+        font:
+          400 19px/1.5 "Amiri",
+          serif;
+        text-decoration: none;
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .action:hover {
+        transform: translateY(-2px);
+      }
+      .action-primary {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .action-primary:hover {
+        background: #403226;
+      }
+      .action-secondary:hover {
+        background: rgba(36, 28, 20, 0.06);
+      }
+      .action-arrow {
+        font:
+          400 18px/1 "DM Sans",
+          sans-serif;
+      }
+
+      .socials {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 24px;
+        margin-top: 38px;
+      }
+
+      .socials a {
+        color: var(--muted);
+        font:
+          400 15px/1.6 "Amiri",
+          serif;
+        text-decoration: none;
+      }
+
+      .socials a:hover {
+        color: var(--ink);
+      }
+
+      @media (max-width: 600px) {
+        .about-header {
+          min-height: 72px;
+          padding: 14px 18px;
+        }
+        .brand {
+          font-size: 19px;
+        }
+        .brand img {
+          width: 22px;
+          height: 30px;
+        }
+        .about-nav {
+          gap: 14px;
+        }
+        .about-nav a {
+          font-size: 12px;
+        }
+        .about-main {
+          min-height: calc(100svh - 72px);
+          padding: 22px 18px 34px;
+        }
+        .portrait {
+          width: 118px;
+          margin-bottom: 15px;
+        }
+        .intro {
+          margin-top: 12px;
+        }
+        .divider {
+          margin: 25px 0 22px;
+        }
+        .skills {
+          gap: 8px;
+        }
+        .skill {
+          padding: 5px 13px 7px;
+          font-size: 16px;
+        }
+        .actions {
+          width: 100%;
+          gap: 9px;
+          margin-top: 30px;
+        }
+        .action {
+          min-height: 52px;
+          padding-inline: 21px;
+          font-size: 17px;
+        }
+        .socials {
+          gap: 18px;
+          margin-top: 27px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+    <style id="dmv-css">
+      #dmv{position:fixed;inset:0;z-index:2147483600;pointer-events:none;display:none}
+      html.dm-veiling #dmv,#dmv.on{display:block;pointer-events:all}
+      #dmv svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+      #dmv path{fill:#f6f1e7}
+      .dmv-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:16px;color:#241c14;white-space:nowrap;font:600 clamp(30px,4.4vw,58px)/1 "Cormorant Garamond",Georgia,serif;letter-spacing:.005em}
+      .dmv-mark img{height:clamp(58px,7vw,84px);width:auto}
+      .dmv-mark i{display:block;width:120px;height:1px;background:rgba(36,28,20,.14);position:relative;overflow:hidden;margin-top:6px}
+      .dmv-mark i:after{content:"";position:absolute;inset:0;background:#b08d57;transform:scaleX(0);transform-origin:left;animation:dmvbar 1.4s cubic-bezier(.65,0,.35,1) infinite}
+      @keyframes dmvbar{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
+    </style>
+    <script>
+      try {
+        if (sessionStorage.getItem("dmVeil")) {
+          document.documentElement.classList.add("dm-veiling");
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <header class="about-header">
+      <a class="brand" href="/" aria-label="NAGI — الرئيسية">
+        <img src="/site/assets/nagi-logo-sm.webp" alt="" />
+        <span>NAGI</span>
+      </a>
+      <nav class="about-nav" aria-label="التنقل الرئيسي">
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </header>
+    <main class="about-main">
+      <img
+        class="portrait"
+        src="/site/assets/nagi-logo-sm.webp"
+        alt="صورة ناجي"
+        width="247"
+        height="320"
+      />
+      <p class="eyebrow">نبذة عني</p>
+      <h1>أهلاً، أنا ناجي</h1>
+      <p class="intro">
+        أصمّم وأبني هويات ومواقع وأنظمة رقمية، وأحوّل الأفكار إلى تجارب تفاعلية تشعرك أنك داخل عالم
+        كامل. أعمل مع علامات تجارية في السعودية والإمارات ومصر، وأؤمن أن كل مشروع يستحق قصة تُروى
+        بإتقان.
+      </p>
+      <hr class="divider" />
+      <div class="skills" aria-label="مجالات العمل">
+        <span class="skill">تطوير المواقع</span>
+        <span class="skill">تطوير الأنظمة</span>
+        <span class="skill">تجارب ويب ثلاثية الأبعاد</span>
+        <span class="skill">الهوية البصرية</span>
+        <span class="skill">التطوير الإبداعي</span>
+        <span class="skill">أتمتة بالذكاء الاصطناعي</span>
+      </div>
+      <div class="actions">
+        <a class="action action-secondary" href="/contact/">تواصل معي</a>
+        <a class="action action-primary" href="/projects/">
+          شاهد مشاريعي <span class="action-arrow" aria-hidden="true">↙</span>
+        </a>
+      </div>
+      <nav class="socials" aria-label="التواصل الاجتماعي">
+        <a href="https://www.instagram.com/khyal_agency" target="_blank" rel="noopener noreferrer"
+          >إنستغرام</a
+        >
+        <a
+          href="https://www.tiktok.com/@craftedbyabdelrahman"
+          target="_blank"
+          rel="noopener noreferrer"
+          >تيك توك</a
+        >
+        <a href="mailto:abdelrahman.studio.info@gmail.com">البريد</a>
+        <a href="https://wa.me/201222576172" target="_blank" rel="noopener noreferrer">واتساب</a>
+      </nav>
+    </main>
+    <script src="/site/assets/dm-veil.js?v=1b" defer></script>
+  </body>
+</html>

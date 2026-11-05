@@ -8,6 +8,12 @@
   var isStory = location.pathname.indexOf('/story') === 0;
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  if (!D.getElementById('dmv-css')) {
+    var style = D.createElement('style');
+    style.id = 'dmv-css';
+    style.textContent = '#dmv{position:fixed;inset:0;z-index:2147483600;pointer-events:none;display:none}html.dm-veiling #dmv,#dmv.on{display:block;pointer-events:all}#dmv svg{position:absolute;inset:0;width:100%;height:100%;display:block}#dmv path{fill:#f6f1e7}.dmv-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:16px;color:#241c14;white-space:nowrap;font:600 clamp(30px,4.4vw,58px)/1 "Cormorant Garamond",Georgia,serif;letter-spacing:.005em}.dmv-mark img{height:clamp(58px,7vw,84px);width:auto}.dmv-mark i{display:block;width:120px;height:1px;background:rgba(36,28,20,.14);position:relative;overflow:hidden;margin-top:6px}.dmv-mark i:after{content:"";position:absolute;inset:0;background:#b08d57;transform:scaleX(0);transform-origin:left;animation:dmvbar 1.4s cubic-bezier(.65,0,.35,1) infinite}@keyframes dmvbar{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}';
+    D.head.appendChild(style);
+  }
   var ov = D.getElementById('dmv');
   if (!ov) {
     ov = D.createElement('div');
@@ -123,8 +129,9 @@
     try { u = new URL(a.href, location.href); } catch (e) { return false; }
     if (u.origin !== location.origin || u.pathname === location.pathname) return false;
     var toStory = u.pathname.indexOf('/story') === 0;
-    // Theme pages keep their own transitions between each other; anything touching Story uses ours.
-    return isStory ? /^\/(projects|contact|world)?\/?$/.test(u.pathname) : toStory;
+    var toAbout = u.pathname.indexOf('/about') === 0;
+    // Theme pages keep their own transitions; Story and About are standalone documents.
+    return isStory ? /^\/(projects|contact|world)?\/?$/.test(u.pathname) : toStory || toAbout;
   }
 
   // Keep the theme router away from Story links.
