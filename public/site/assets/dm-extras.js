@@ -3,14 +3,13 @@
   window.__dmExtras = true;
 
   var TRACKS = [
-    { title: "Spill Your Time", artist: "KatzPascale", art: "/site/assets/art-syt.jpg", src: null },
-    { title: "I Wanna Be Yours", artist: "Arctic Monkeys", art: "/site/assets/art-iwby.jpg", src: "/site/assets/track-i-wanna-be-yours.mp3" },
-    { title: "Blinding Lights", artist: "The Weeknd", art: "/site/assets/art-bl.jpg", src: "/site/assets/track-blinding-lights.mp3" },
+    // Index 0 is the site's built-in song: hidden, kept only as the silent guide.
+    { title: "", artist: "", art: "/site/assets/tamally-maak-2-cover-sm.webp", src: null, hidden: true },
     { title: "تملي معاك (مقطع ٢)", artist: "عمرو دياب", art: "/site/assets/tamally-maak-2-cover-sm.webp", src: "/site/assets/tamally-maak-2.mp3" },
     { title: "تملي معاك", artist: "عمرو دياب", art: "/site/assets/tamally-maak-cover-sm.webp", src: "/site/assets/tamally-maak.mp3" }
   ];
   var AR = document.documentElement.lang === "ar";
-  var current = 0, muted = false, bypass = false;
+  var current = 1, muted = false, bypass = false;
   var userVol = 1;
   try { userVol = Math.max(0, Math.min(1, parseFloat(localStorage.getItem("dmVol")) || 1)); } catch (e) {}
   window.__dmUserVol = userVol;
@@ -59,6 +58,8 @@
     var inter = /^\/world(\/|$)/.test(location.pathname);
     if (b && (!b.style.getPropertyValue("--dm-art") || inter !== panel.classList.contains("is-inter"))) render();
     // Guard: an extra song is on, so the site's own song must stay silent (no two songs at once).
+    // Start the chosen song as soon as the site's own song begins (after Enter).
+    if (alt.paused && current !== 0 && !muted && !document.hidden && guide()) play();
     if (!alt.paused && current !== 0 && !muted && !siteMuted() && Date.now() - (window.__dmMuteFixAt || 0) > 1500) { window.__dmMuteFixAt = Date.now(); setSiteMute(true); }
     if (!fx || alt.paused) return;
     var t = fx.ctx.currentTime, gd = guide(), inWorld = /^\/world/.test(location.pathname);
@@ -90,6 +91,7 @@
   panel.innerHTML =
     '<p class="dm-music__label">' + (AR ? "يعمل الآن" : "Now playing") + '</p><ul class="dm-music__list">' +
     TRACKS.map(function (t, i) {
+      if (t.hidden) return "";
       return '<li><button type="button" class="dm-music__track" data-i="' + i + '">' +
         '<img src="' + t.art + '" alt="" width="40" height="40">' +
         '<span><b>' + t.title + '</b><small>' + t.artist + '</small></span>' +
