@@ -4,9 +4,8 @@
 
   var TRACKS = [
     // Index 0 is the site's built-in song: hidden, kept only as the silent guide.
-    { title: "", artist: "", art: "/site/assets/tamally-maak-2-cover-sm.webp", src: null, hidden: true },
-    { title: "تملي معاك (مقطع ٢)", artist: "عمرو دياب", art: "/site/assets/tamally-maak-2-cover-sm.webp", src: "/site/assets/tamally-maak-2.mp3" },
-    { title: "تملي معاك", artist: "عمرو دياب", art: "/site/assets/tamally-maak-cover-sm.webp", src: "/site/assets/tamally-maak.mp3" }
+    { title: "", artist: "", art: "/site/assets/music-relax-cover-sm.webp", src: null, hidden: true },
+    { title: "Music Relax", artist: "NAGI", art: "/site/assets/music-relax-cover-sm.webp", src: "/site/assets/music-relax.mp3" }
   ];
   var AR = document.documentElement.lang === "ar";
   var current = 1, muted = false, bypass = false;
