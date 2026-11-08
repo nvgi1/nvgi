@@ -217,7 +217,7 @@
       (AR ? "الخدمة: " : "Service: ") + services.join(", "),
       (AR ? "الاسم: " : "Name: ") + name, (AR ? "الهاتف: " : "Phone: ") + phone, (AR ? "البريد: " : "Email: ") + email];
     var det = v("details"); if (det) lines.push((AR ? "التفاصيل: " : "Details: ") + det);
-    window.open("https://wa.me/201222576172?text=" + encodeURIComponent(lines.join("\n")), "_blank", "noopener");
+    window.open("https://wa.me/18198090934?text=" + encodeURIComponent(lines.join("\n")), "_blank", "noopener");
     f.querySelector(".dm-brief__done").hidden = false;
   });
 
