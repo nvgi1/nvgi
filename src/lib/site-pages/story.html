@@ -336,11 +336,9 @@
     el.textContent = '';
     words.forEach(function (w, wi) {
       var wd = D.createElement('span'); wd.className = 'wd';
-      Array.prototype.forEach.call(w, function (c) {
-        var s = D.createElement('span'); s.className = 'ch'; s.textContent = c;
-        s.style.transitionDelay = (n++ * 16) + 'ms';
-        wd.appendChild(s);
-      });
+      var s = D.createElement('span'); s.className = 'ch'; s.textContent = w;
+      s.style.transitionDelay = (n++ * 60) + 'ms';
+      wd.appendChild(s);
       el.appendChild(wd);
       if (wi < words.length - 1) el.appendChild(D.createTextNode(' '));
     });
