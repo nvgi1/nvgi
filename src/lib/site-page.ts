@@ -11,40 +11,25 @@ import worldAssets from "./reference-world-assets.json";
 const pages = { home, contact, projects, world, notepin, story, about } as const;
 
 const pageDetails = {
-  home: [
-    "NAGI — Websites, Systems & 3D Experiences",
-    "A brand and digital studio in Riyadh, Dubai and Cairo. Crafting brands that command attention.",
-  ],
-  projects: [
-    "Projects — NAGI",
-    "Explore NAGI's websites, systems, brand work and immersive experiences.",
-  ],
-  contact: ["Contact — NAGI", "Start your next website, system or brand project with NAGI."],
-  world: ["World — Inside NAGI", "Step inside NAGI's immersive world of brand and digital craft."],
-  story: [
-    "The Story — NAGI",
-    "Discover the story behind NAGI, from the first idea to Riyadh, Dubai and Cairo.",
-  ],
-  notepin: [
-    "NotePin — Studio Product Experience",
-    "Explore the NotePin product in an immersive studio experience.",
-  ],
-  about: [
-    "نبذة عني — ناجي",
-    "تعرف على ناجي ومجالات عمله في تصميم الهويات والمواقع والأنظمة الرقمية.",
-  ],
+  home: ["Nagi Alnoor Khalifa | Medical Equipment Engineer & Web Developer", "ناجي النور خليفة – مهندس معدات طبية ومطور ويب. اكتشف ملفي المهني، خلفيتي الأكاديمية في هندسة المعدات الطبية، ومشاريعي في تطوير المواقع والأنظمة الرقمية وتصميم التجارب التفاعلية.", "Nagi Alnoor Khalifa — Engineering Meets Technology", "website"],
+  projects: ["Projects | Nagi Alnoor Khalifa — Web Developer", "مشاريع ناجي النور خليفة في تطوير المواقع والأنظمة الرقمية وتصميم التجارب التفاعلية.", "Projects by Nagi Alnoor Khalifa — Web Development & Interactive Experiences", "website"],
+  contact: ["Contact | Nagi Alnoor Khalifa", "تواصل مع ناجي النور خليفة، مهندس معدات طبية ومطور ويب، عبر واتساب أو البريد الإلكتروني.", "Contact Nagi Alnoor Khalifa", "website"],
+  world: ["World | NAGI — Nagi Alnoor Khalifa", "تجربة تفاعلية ثلاثية الأبعاد من تصميم ناجي النور خليفة تجمع بين الهندسة والتقنية.", "The World of NAGI — Interactive 3D Experience", "website"],
+  story: ["Story | Nagi Alnoor Khalifa", "قصة ناجي النور خليفة: من هندسة المعدات الطبية إلى تطوير الويب وبناء التجارب الرقمية.", "The Story of Nagi Alnoor Khalifa", "article"],
+  about: ["About | Nagi Alnoor Khalifa — Medical Equipment Engineer", "الملف المهني لناجي النور خليفة: الخلفية الأكاديمية في هندسة المعدات الطبية، الخبرات، الشهادات، والسيرة الذاتية.", "About Nagi Alnoor Khalifa — Medical Equipment Engineer & Web Developer", "profile"],
+  notepin: ["NotePin Experience | NAGI", "تجربة عرض تفاعلية لمنتج NotePin ضمن موقع NAGI.", "NotePin Experience | NAGI", "website"],
 } as const;
 
 export function siteHead(name: keyof typeof pages) {
-  const [title, description] = pageDetails[name];
+  const [title, description, ogTitle, ogType] = pageDetails[name];
   return {
     meta: [
       { title },
       { name: "description", content: description },
-      { property: "og:title", content: title },
+      { property: "og:title", content: ogTitle },
       { property: "og:description", content: description },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: ogType },
+      { name: "twitter:card", content: "summary" },
     ],
   };
 }
