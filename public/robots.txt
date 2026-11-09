@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /notepin
 
-Sitemap: https://nvgi.lovable.app/sitemap.xml
+Sitemap: https://www.nagialnoor.cyou/sitemap.xml
