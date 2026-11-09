@@ -20,6 +20,6 @@
 - NotePin's page layer and top bar sit above the site-wide purple colour wash (html::after, mix-blend color), so the product shows in its true colours there; other pages keep the wash.
 - Examples (public/examples/*.html) are standalone pages opened inside the site in a sliding iframe layer from dm-extras.js, so their heavy 3D code never loads on Home and they stay separate from the water scene.
 - The reference site's Story page is served as its own original HTML document at /story, with dm-veil.js handling transitions to and from the water-scene pages, so its independent narrative experience stays intact.
-- The About page is served as its own Arabic HTML document at /about, with its biographical content and project/contact links kept separate from the water-scene pages.
+- The About page (/about) is a full-screen frame of the separate medical site on its own subdomain, with the back-to-home arrow drawn on the parent page because the framed site is cross-origin and cannot be edited from here.
 - Newly imported reference media uses committed Lovable Assets pointers resolved in exported HTML and supplemental scripts; existing scene files retain their local paths to preserve the original loader and texture pipeline.
 - Home's entry presentation is scoped in public/site/assets/nagi-entry.css so its lettering can change without altering the shared scene loader or other pages.
