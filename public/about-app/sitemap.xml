@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Replace __SITE_URL__ with the deployed website origin before publishing. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>__SITE_URL__/</loc></url>
+  <url><loc>__SITE_URL__/profile</loc></url>
+  <url><loc>__SITE_URL__/projects</loc></url>
+  <url><loc>__SITE_URL__/projects/graduation-study</loc></url>
+  <url><loc>__SITE_URL__/certifications</loc></url>
+  <url><loc>__SITE_URL__/medical-equipment</loc></url>
+  <url><loc>__SITE_URL__/education</loc></url>
+  <url><loc>__SITE_URL__/resume</loc></url>
+  <url><loc>__SITE_URL__/contact</loc></url>
+</urlset>
