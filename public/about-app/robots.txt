@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Replace __SITE_URL__ with the deployed website origin before publishing.
+Sitemap: __SITE_URL__/sitemap.xml
