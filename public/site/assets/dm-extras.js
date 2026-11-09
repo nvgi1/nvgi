@@ -97,7 +97,7 @@
         '<i class="dm-music__eq" aria-hidden="true"><em></em><em></em><em></em></i></button></li>';
     }).join("") +
     '<li class="dm-music__inter"><button type="button" class="dm-music__track dm-music__track--inter is-active">' +
-    '<img src="/site/assets/art-interstellar.jpg" alt="" width="40" height="40"><span><b>Interstellar</b><small>Hans Zimmer</small></span>' +
+    '<img src="/site/assets/art-interstellar.webp" alt="" width="40" height="40"><span><b>Interstellar</b><small>Hans Zimmer</small></span>' +
     '<i class="dm-music__eq" aria-hidden="true"><em></em><em></em><em></em></i></button></li>' +
     '</ul><div class="dm-music__vol"><span aria-hidden="true">🔈</span>' +
     '<input type="range" class="dm-music__vol-range" min="0" max="100" value="' + Math.round(userVol * 100) + '" aria-label="' + (AR ? "مستوى الصوت" : "Volume") + '">' +
@@ -114,7 +114,7 @@
     panel.classList.toggle("is-muted", muted);
     panel.querySelector(".dm-music__mute-text").textContent = muted ? (AR ? "تشغيل الصوت" : "Unmute") : (AR ? "كتم الصوت" : "Mute");
     var b = muteBtn();
-    if (b) b.style.setProperty("--dm-art", "url('" + (inter ? "/site/assets/art-interstellar.jpg" : TRACKS[current].art) + "')");
+    if (b) b.style.setProperty("--dm-art", "url('" + (inter ? "/site/assets/art-interstellar.webp" : TRACKS[current].art) + "')");
   }
   function play() {
     if (muted) return;
